@@ -52,7 +52,7 @@ public class GestorDB {
         return game;
     }
     
-    public void insertGame(Game game) throws SQLException{
+    public int insertGame(Game game) throws SQLException{
         String insert = "insert into GAMES " +
                         "(name, description, type, age) " +
                         "VALUES ('" + game.getName() +
@@ -60,8 +60,17 @@ public class GestorDB {
                         "','" + game.getType() +
                         "','"  + game.getAge() + "')";                        
         Statement stmt = con.createStatement();
-        stmt.executeUpdate(insert);
-        stmt.close();        
+        stmt.executeUpdate(insert, Statement.RETURN_GENERATED_KEYS);
+        ResultSet generatedKeys = stmt.getGeneratedKeys();
+        if (generatedKeys.next()) {
+        	long key=generatedKeys.getLong(1);
+            stmt.close();        
+            return (int)key;
+        }
+        else {
+            stmt.close();        
+            return -1;
+        }
     }
     
    
